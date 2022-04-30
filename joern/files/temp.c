@@ -1,16 +1,33 @@
-static bool check_rodc_critical_attribute(struct ldb_message *msg)
+static int samldb_fill_foreignSecurityPrincipal_object(struct samldb_ctx *ac)
 {
-	uint32_t schemaFlagsEx, searchFlags, rodc_filtered_flags;
+	struct ldb_context *ldb;
+	const struct ldb_val *rdn_value;
+	struct dom_sid *sid;
+	int ret;
 
-	schemaFlagsEx = ldb_msg_find_attr_as_uint(msg, "schemaFlagsEx", 0);
-	searchFlags = ldb_msg_find_attr_as_uint(msg, "searchFlags", 0);
-	rodc_filtered_flags = (SEARCH_FLAG_RODC_ATTRIBUTE
-			      | SEARCH_FLAG_CONFIDENTIAL);
+	ldb = ldb_module_get_ctx(ac->module);
 
-	if ((schemaFlagsEx & SCHEMA_FLAG_ATTR_IS_CRITICAL) &&
-		((searchFlags & rodc_filtered_flags) == rodc_filtered_flags)) {
-		return true;
-	} else {
-		return false;
+	sid = samdb_result_dom_sid(ac->msg, ac->msg, "objectSid");
+	if (sid == NULL) {
+		rdn_value = ldb_dn_get_rdn_val(ac->msg->dn);
+		if (rdn_value == NULL) {
+			return ldb_operr(ldb);
+		}
+		sid = dom_sid_parse_talloc(ac->msg,
+					   (const char *)rdn_value->data);
+		if (sid == NULL) {
+			ldb_set_errstring(ldb,
+					  "samldb: No valid SID found in ForeignSecurityPrincipal CN!");
+			return LDB_ERR_CONSTRAINT_VIOLATION;
+		}
+		if (! samldb_msg_add_sid(ac->msg, "objectSid", sid)) {
+			return ldb_operr(ldb);
+		}
 	}
+
+	/* finally proceed with adding the entry */
+	ret = samldb_add_step(ac, samldb_add_entry);
+	if (ret != LDB_SUCCESS) return ret;
+
+	return samldb_first_step(ac);
 }

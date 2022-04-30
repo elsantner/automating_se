@@ -1,7 +1,7 @@
 import subprocess
 import pandas as pd
 
-df = pd.read_csv('D:/Elias/Documents/AAU/Automating_SE/automating_se/big-vul_dataset/____test.csv', skipinitialspace=True, low_memory = True)
+df = pd.read_csv('../big-vul_dataset/functions_only_all.csv', skipinitialspace=True, low_memory = True)
 
 for index, row in df.iterrows():
 
