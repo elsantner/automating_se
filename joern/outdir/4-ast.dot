@@ -1,0 +1,11 @@
+digraph "<operator>.indirectFieldAccess" {  
+"88" [label = "(METHOD,<operator>.indirectFieldAccess)" ]
+"89" [label = "(PARAM,p1)" ]
+"90" [label = "(PARAM,p2)" ]
+"91" [label = "(METHOD_RETURN,ANY)" ]
+"92" [label = "(BLOCK,<empty>,<empty>)" ]
+  "88" -> "91" 
+  "88" -> "89" 
+  "88" -> "92" 
+  "88" -> "90" 
+}

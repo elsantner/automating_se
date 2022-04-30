@@ -1,0 +1,9 @@
+digraph "ldb_module_get_ctx" {  
+"84" [label = "(METHOD,ldb_module_get_ctx)" ]
+"85" [label = "(PARAM,p1)" ]
+"86" [label = "(METHOD_RETURN,ANY)" ]
+"87" [label = "(BLOCK,<empty>,<empty>)" ]
+  "84" -> "86" 
+  "84" -> "85" 
+  "84" -> "87" 
+}

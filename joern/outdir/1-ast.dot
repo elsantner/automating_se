@@ -1,0 +1,97 @@
+digraph "samldb_add_entry" {  
+"7" [label = "(METHOD,samldb_add_entry)" ]
+"8" [label = "(PARAM,struct samldb_ctx *ac)" ]
+"9" [label = "(BLOCK,<empty>,<empty>)" ]
+"10" [label = "(LOCAL,struct ldb_context* ldb: ldb_context)" ]
+"11" [label = "(LOCAL,struct ldb_request* req: ldb_request)" ]
+"12" [label = "(LOCAL,int ret: int)" ]
+"13" [label = "(<operator>.assignment,ldb = ldb_module_get_ctx(ac->module))" ]
+"14" [label = "(IDENTIFIER,ldb,ldb = ldb_module_get_ctx(ac->module))" ]
+"15" [label = "(ldb_module_get_ctx,ldb_module_get_ctx(ac->module))" ]
+"16" [label = "(<operator>.indirectFieldAccess,ac->module)" ]
+"17" [label = "(IDENTIFIER,ac,ldb_module_get_ctx(ac->module))" ]
+"18" [label = "(FIELD_IDENTIFIER,module,module)" ]
+"19" [label = "(<operator>.assignment,ret = ldb_build_add_req(&req, ldb, ac,\n\t\t\t\tac->msg,\n\t\t\t\tac->req->controls,\n\t\t\t\tac, samldb_add_entry_callback,\n\t\t\t\tac->req))" ]
+"20" [label = "(IDENTIFIER,ret,ret = ldb_build_add_req(&req, ldb, ac,\n\t\t\t\tac->msg,\n\t\t\t\tac->req->controls,\n\t\t\t\tac, samldb_add_entry_callback,\n\t\t\t\tac->req))" ]
+"21" [label = "(ldb_build_add_req,ldb_build_add_req(&req, ldb, ac,\n\t\t\t\tac->msg,\n\t\t\t\tac->req->controls,\n\t\t\t\tac, samldb_add_entry_callback,\n\t\t\t\tac->req))" ]
+"22" [label = "(<operator>.addressOf,&req)" ]
+"23" [label = "(IDENTIFIER,req,ldb_build_add_req(&req, ldb, ac,\n\t\t\t\tac->msg,\n\t\t\t\tac->req->controls,\n\t\t\t\tac, samldb_add_entry_callback,\n\t\t\t\tac->req))" ]
+"24" [label = "(IDENTIFIER,ldb,ldb_build_add_req(&req, ldb, ac,\n\t\t\t\tac->msg,\n\t\t\t\tac->req->controls,\n\t\t\t\tac, samldb_add_entry_callback,\n\t\t\t\tac->req))" ]
+"25" [label = "(IDENTIFIER,ac,ldb_build_add_req(&req, ldb, ac,\n\t\t\t\tac->msg,\n\t\t\t\tac->req->controls,\n\t\t\t\tac, samldb_add_entry_callback,\n\t\t\t\tac->req))" ]
+"26" [label = "(<operator>.indirectFieldAccess,ac->msg)" ]
+"27" [label = "(IDENTIFIER,ac,ldb_build_add_req(&req, ldb, ac,\n\t\t\t\tac->msg,\n\t\t\t\tac->req->controls,\n\t\t\t\tac, samldb_add_entry_callback,\n\t\t\t\tac->req))" ]
+"28" [label = "(FIELD_IDENTIFIER,msg,msg)" ]
+"29" [label = "(<operator>.indirectFieldAccess,ac->req->controls)" ]
+"30" [label = "(<operator>.indirectFieldAccess,ac->req)" ]
+"31" [label = "(IDENTIFIER,ac,ldb_build_add_req(&req, ldb, ac,\n\t\t\t\tac->msg,\n\t\t\t\tac->req->controls,\n\t\t\t\tac, samldb_add_entry_callback,\n\t\t\t\tac->req))" ]
+"32" [label = "(FIELD_IDENTIFIER,req,req)" ]
+"33" [label = "(FIELD_IDENTIFIER,controls,controls)" ]
+"34" [label = "(IDENTIFIER,ac,ldb_build_add_req(&req, ldb, ac,\n\t\t\t\tac->msg,\n\t\t\t\tac->req->controls,\n\t\t\t\tac, samldb_add_entry_callback,\n\t\t\t\tac->req))" ]
+"35" [label = "(IDENTIFIER,samldb_add_entry_callback,ldb_build_add_req(&req, ldb, ac,\n\t\t\t\tac->msg,\n\t\t\t\tac->req->controls,\n\t\t\t\tac, samldb_add_entry_callback,\n\t\t\t\tac->req))" ]
+"36" [label = "(<operator>.indirectFieldAccess,ac->req)" ]
+"37" [label = "(IDENTIFIER,ac,ldb_build_add_req(&req, ldb, ac,\n\t\t\t\tac->msg,\n\t\t\t\tac->req->controls,\n\t\t\t\tac, samldb_add_entry_callback,\n\t\t\t\tac->req))" ]
+"38" [label = "(FIELD_IDENTIFIER,req,req)" ]
+"39" [label = "(LDB_REQ_SET_LOCATION,LDB_REQ_SET_LOCATION(req))" ]
+"40" [label = "(IDENTIFIER,req,LDB_REQ_SET_LOCATION(req))" ]
+"41" [label = "(CONTROL_STRUCTURE,if (ret != LDB_SUCCESS),if (ret != LDB_SUCCESS))" ]
+"42" [label = "(<operator>.notEquals,ret != LDB_SUCCESS)" ]
+"43" [label = "(IDENTIFIER,ret,ret != LDB_SUCCESS)" ]
+"44" [label = "(IDENTIFIER,LDB_SUCCESS,ret != LDB_SUCCESS)" ]
+"45" [label = "(BLOCK,<empty>,<empty>)" ]
+"46" [label = "(RETURN,return ret;,return ret;)" ]
+"47" [label = "(IDENTIFIER,ret,return ret;)" ]
+"48" [label = "(RETURN,return ldb_next_request(ac->module, req);,return ldb_next_request(ac->module, req);)" ]
+"49" [label = "(ldb_next_request,ldb_next_request(ac->module, req))" ]
+"50" [label = "(<operator>.indirectFieldAccess,ac->module)" ]
+"51" [label = "(IDENTIFIER,ac,ldb_next_request(ac->module, req))" ]
+"52" [label = "(FIELD_IDENTIFIER,module,module)" ]
+"53" [label = "(IDENTIFIER,req,ldb_next_request(ac->module, req))" ]
+"54" [label = "(METHOD_RETURN,int)" ]
+  "7" -> "8" 
+  "7" -> "9" 
+  "7" -> "54" 
+  "9" -> "10" 
+  "9" -> "11" 
+  "9" -> "12" 
+  "9" -> "13" 
+  "9" -> "19" 
+  "9" -> "39" 
+  "9" -> "41" 
+  "9" -> "48" 
+  "13" -> "14" 
+  "13" -> "15" 
+  "15" -> "16" 
+  "16" -> "17" 
+  "16" -> "18" 
+  "19" -> "20" 
+  "19" -> "21" 
+  "21" -> "22" 
+  "21" -> "24" 
+  "21" -> "25" 
+  "21" -> "26" 
+  "21" -> "29" 
+  "21" -> "34" 
+  "21" -> "35" 
+  "21" -> "36" 
+  "22" -> "23" 
+  "26" -> "27" 
+  "26" -> "28" 
+  "29" -> "30" 
+  "29" -> "33" 
+  "30" -> "31" 
+  "30" -> "32" 
+  "36" -> "37" 
+  "36" -> "38" 
+  "39" -> "40" 
+  "41" -> "42" 
+  "41" -> "45" 
+  "42" -> "43" 
+  "42" -> "44" 
+  "45" -> "46" 
+  "46" -> "47" 
+  "48" -> "49" 
+  "49" -> "50" 
+  "49" -> "53" 
+  "50" -> "51" 
+  "50" -> "52" 
+}
