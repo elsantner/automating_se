@@ -93,15 +93,32 @@ class EncoderCountVectorizer:
         # return joined df
         return df_joined
         
+    # Return a df of features
+    def encodeSingle(self, list_lines):
+        # get feature matrices (as a dfs)
+        df_enc_lines = self.__vectorizer_encode(list_lines)
+        
+        # return df
+        return df_enc_lines
+        
         
 # Most precise since the embeddings of all 3 features are preserved
 # On average 2x slower than EncoderBERTStringConcat
 class EncoderBERTVectorConcat:
+    # avg_embeddings ... If true, then the encoded embeddings are averaged, otherwise the first embedding vector is returned
+    def __init__(self, avg_embeddings=True):
+        self.avg_embeddings = avg_embeddings
+
     # Condense multiple embeddings vectors to ONE single vector using element-wise averaging 
     def __condenseEmbeddings(self, context_embeddings):
         np_array = context_embeddings.detach().numpy()
-        avg_embedding = np.mean(np_array[0].tolist(), axis=0)
-        return avg_embedding
+        
+        if (self.avg_embeddings):
+            avg_embedding = np.mean(np_array[0].tolist(), axis=0)
+            return avg_embedding
+        else:
+            # just take the first embedding vector
+            return np_array[0][0]
 
     # Return n 768 vectors
     # This vector is created by element-wise averaging of all token vectors of a string 
@@ -130,16 +147,31 @@ class EncoderBERTVectorConcat:
 
         # concat 3x768 vectors to 1x2304 vector 
         return [np.concatenate((l, p, n)) for l, p, n in zip(encoded_lines, encoded_prev_lines, encoded_next_lines)]
+    
+    # Return a df of features
+    def encodeSingle(self, list_lines):
+        encoded_lines = self.__bert_encode(list_lines)
+        # return 768 vector
+        return encoded_lines
 
 
 # Less precise since all 3 features are concatenated before embedding creation
 # On average 2x faster than EncoderBERTVectorConcat
 class EncoderBERTStringConcat:
+    # avg_embeddings ... If true, then the encoded embeddings are averaged, otherwise the first embedding vector is returned
+    def __init__(self, avg_embeddings=True):
+        self.avg_embeddings = avg_embeddings
+    
     # Condense multiple embeddings vectors to ONE single vector using element-wise averaging 
     def __condenseEmbeddings(self, context_embeddings):
         np_array = context_embeddings.detach().numpy()
-        avg_embedding = np.mean(np_array[0].tolist(), axis=0)
-        return avg_embedding
+        
+        if (self.avg_embeddings):
+            avg_embedding = np.mean(np_array[0].tolist(), axis=0)
+            return avg_embedding
+        else:
+            # just take the first embedding vector
+            return np_array[0][0]
 
     # Return n 768 vectors
     # This vector is created by element-wise averaging of all token vectors of a string 
@@ -168,3 +200,7 @@ class EncoderBERTStringConcat:
     def encode(self, list_lines, list_prev_lines, list_next_lines):
         encoded_lines = self.__bert_encode(list_lines, list_prev_lines, list_next_lines)
         return encoded_lines
+        
+    # not supported (use EncoderBERTVectorConcat instead)
+    def encodeSingle(self, list_lines):
+        raise NotImplementedError("use EncoderBERTVectorConcat instead")
