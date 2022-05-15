@@ -64,9 +64,10 @@ class EncoderCountVectorizer:
         newVec = CountVectorizer(tokenizer = tokenizer_bert.tokenize,    \
                                      preprocessor = None, \
                                      stop_words = None,   \
-                                     max_features=750, \
+                                     max_features=1500, \
                                      lowercase=False,\
-                                     min_df=1)
+                                     min_df=0.01,
+                                     max_df=0.2)
         newVec.fit_transform(all_lines)
         return newVec.vocabulary_
     
