@@ -1,5 +1,6 @@
 from transformers import AutoTokenizer, AutoModel
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 import torch
 import pandas as pd
 import numpy as np
@@ -65,9 +66,7 @@ class EncoderCountVectorizer:
                                      preprocessor = None, \
                                      stop_words = None,   \
                                      max_features=1500, \
-                                     lowercase=False,\
-                                     min_df=0.01,
-                                     max_df=0.2)
+                                     lowercase=False)
         newVec.fit_transform(all_lines)
         return newVec.vocabulary_
     
@@ -102,6 +101,97 @@ class EncoderCountVectorizer:
         # return df
         return df_enc_lines
         
+
+# Use a standard vectorization approach by creating a feature matrix.
+# Loses semantic and structural information, but it is FAST (>> anything BERT embedding related)
+# Pre-configured to use 750 features 
+class EncoderTFIDFVectorizer:
+    # df_data required for vocabulary creation
+    def __init__(self, df_data=None, vocabulary_path=None):
+        if (df_data is None and vocabulary_path is None):
+            raise ValueError("df_data or vocabulary_path must be set.")
+            
+        if (vocabulary_path is not None):
+            try:
+                # load vocab from file
+                vocab = self.__load_vocabulary(vocabulary_path)
+                # Show warning if both params were set and loading succeeded
+                if (df_data is not None and vocabulary_path is not None):
+                    warnings.warn("Both df_data and vocabulary_path are set. Ignoring df_data.")
+            except:
+                # if file not found, try to extract from data ...
+                if (df_data is not None):
+                    warnings.warn("Loading vocabulary form '{0}' failed. Falling back to df_data.".format(vocabulary_path))
+                    vocab = self.__extract_vocabulary(df_data)
+                    if (vocabulary_path is not None):
+                        self.__save_vocabulary(vocab, vocabulary_path)
+                # ... otherwise fail
+                else:
+                    raise ValueError("Cannot load vocabulary form '{0}'.".format(vocabulary_path))
+        else:
+            vocab = self.__extract_vocabulary(df_data)
+            if (vocabulary_path is not None):
+                self.__save_vocabulary(vocab, vocabulary_path)
+            
+        
+        # Create another CountVectorizer with the vocabulary from the CV above
+        # (ensures to have consistent token features for test, training, validation)
+        self.vectorizer = TfidfVectorizer(tokenizer = tokenizer_bert.tokenize,    \
+                             preprocessor = None, \
+                             stop_words = None,   \
+                             lowercase=False, \
+                             vocabulary=vocab)
+    
+    def __load_vocabulary(self, vocabulary_path):
+        return joblib.load(vocabulary_path)
+        
+    def __save_vocabulary(self, vocabulary, vocabulary_path):
+        joblib.dump(vocabulary, vocabulary_path)
+    
+    def __extract_vocabulary(self, df_data):
+        all_lines = df_data['line'].tolist() + df_data['prev_line'].tolist() + df_data['next_line'].tolist()
+        
+        # Create a count vectorizer on the whole dataset and include the most occuring n tokens
+        # tokenizer takes CodeBERT as function
+        newVec = TfidfVectorizer(tokenizer = tokenizer_bert.tokenize,    \
+                                     preprocessor = None, \
+                                     stop_words = None,   \
+                                     max_features=1000, \
+                                     lowercase=False)
+        newVec.fit_transform(all_lines)
+        return newVec.vocabulary_
+    
+    # Return feature matrix for list_of_strings
+    # columns ... features
+    # index ... row index of input list
+    def __vectorizer_encode(self, list_of_strings):
+        features = self.vectorizer.fit_transform(list_of_strings)
+        return pd.DataFrame(features.toarray(), columns=self.vectorizer.get_feature_names_out())
+
+    # Return a df of features
+    # Please note that this DF contains 3x the columns as features, 
+    # since features are distinctly represened for line, prev_line and next_line 
+    def encode(self, list_lines, list_prev_lines, list_next_lines):
+        # get feature matrices (as a dfs)
+        df_enc_lines = self.__vectorizer_encode(list_lines)
+        df_enc_prev_lines = self.__vectorizer_encode(list_prev_lines)
+        df_enc_next_lines = self.__vectorizer_encode(list_next_lines)
+        
+        # join feature matrices, but preserve distinction by adding suffix
+        df_joined = df_enc_lines.join(df_enc_prev_lines, rsuffix="_prev")
+        df_joined = df_joined.join(df_enc_next_lines, rsuffix="_next")
+        
+        # return joined df
+        return df_joined
+        
+    # Return a df of features
+    def encodeSingle(self, list_lines):
+        # get feature matrices (as a dfs)
+        df_enc_lines = self.__vectorizer_encode(list_lines)
+        
+        # return df
+        return df_enc_lines        
+
         
 # Most precise since the embeddings of all 3 features are preserved
 # On average 2x slower than EncoderBERTStringConcat
