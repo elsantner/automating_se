@@ -11,3 +11,6 @@ Trying to automate vulnerability detection on line level...
 ## Data
 This project uses the _BigVul_ dataset. The full dataset (1.5 GB compressed) can be downloaded [here](https://drive.google.com/file/d/1-0VhnHBp9IGh90s2wCNjeCMuy70HPl8X/view?usp=sharing).
 Alternatively, a already pre-processed version of the dataset on line-level (all entries and a sample) can be found [here](https://drive.google.com/drive/folders/1O6IBl6rN3U6ECROFGWGW2w0L-GztY8p5?usp=sharing).
+
+## Models
+Pre-trained models can be found [here](https://drive.google.com/drive/folders/1ex_OStFQw_AYxB-a8mmNqj35ocsut6m2?usp=sharing).
