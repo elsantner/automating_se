@@ -80,7 +80,7 @@ class EncoderCountVectorizer:
     # Return a df of features
     # Please note that this DF contains 3x the columns as features, 
     # since features are distinctly represened for line, prev_line and next_line 
-    def encode(self, list_lines, list_prev_lines, list_next_lines):
+    def encode(self, list_lines, list_prev_lines, list_next_lines, func_vuls):
         # get feature matrices (as a dfs)
         df_enc_lines = self.__vectorizer_encode(list_lines)
         df_enc_prev_lines = self.__vectorizer_encode(list_prev_lines)
@@ -89,17 +89,10 @@ class EncoderCountVectorizer:
         # join feature matrices, but preserve distinction by adding suffix
         df_joined = df_enc_lines.join(df_enc_prev_lines, rsuffix="_prev")
         df_joined = df_joined.join(df_enc_next_lines, rsuffix="_next")
+        df_joined = df_joined.join(pd.DataFrame(func_vuls, columns=['func_vul']))
         
         # return joined df
         return df_joined
-        
-    # Return a df of features
-    def encodeSingle(self, list_lines):
-        # get feature matrices (as a dfs)
-        df_enc_lines = self.__vectorizer_encode(list_lines)
-        
-        # return df
-        return df_enc_lines
         
 
 # Use a standard vectorization approach by creating a feature matrix.
@@ -171,7 +164,7 @@ class EncoderTFIDFVectorizer:
     # Return a df of features
     # Please note that this DF contains 3x the columns as features, 
     # since features are distinctly represened for line, prev_line and next_line 
-    def encode(self, list_lines, list_prev_lines, list_next_lines):
+    def encode(self, list_lines, list_prev_lines, list_next_lines, func_vuls):
         # get feature matrices (as a dfs)
         df_enc_lines = self.__vectorizer_encode(list_lines)
         df_enc_prev_lines = self.__vectorizer_encode(list_prev_lines)
@@ -180,17 +173,10 @@ class EncoderTFIDFVectorizer:
         # join feature matrices, but preserve distinction by adding suffix
         df_joined = df_enc_lines.join(df_enc_prev_lines, rsuffix="_prev")
         df_joined = df_joined.join(df_enc_next_lines, rsuffix="_next")
+        df_joined = df_joined.join(pd.DataFrame(func_vuls, columns=['func_vul']))
         
         # return joined df
-        return df_joined
-        
-    # Return a df of features
-    def encodeSingle(self, list_lines):
-        # get feature matrices (as a dfs)
-        df_enc_lines = self.__vectorizer_encode(list_lines)
-        
-        # return df
-        return df_enc_lines        
+        return df_joined 
 
         
 # Most precise since the embeddings of all 3 features are preserved
@@ -231,19 +217,15 @@ class EncoderBERTVectorConcat:
 
     # Return n 2304 vectors by encoding and element-wise concatenation of encoded inputs
     # n ... length of input lists
-    def encode(self, list_lines, list_prev_lines, list_next_lines):
+    def encode(self, list_lines, list_prev_lines, list_next_lines, func_vuls):
         encoded_lines = self.__bert_encode(list_lines)
         encoded_prev_lines = self.__bert_encode(list_prev_lines)
         encoded_next_lines = self.__bert_encode(list_next_lines)
 
-        # concat 3x768 vectors to 1x2304 vector 
-        return [np.concatenate((l, p, n)) for l, p, n in zip(encoded_lines, encoded_prev_lines, encoded_next_lines)]
-    
-    # Return a df of features
-    def encodeSingle(self, list_lines):
-        encoded_lines = self.__bert_encode(list_lines)
-        # return 768 vector
-        return encoded_lines
+        # concat 3x768 vectors to 1x2304 vector
+        df = pd.DataFrame([np.concatenate((l, p, n)) for l, p, n in zip(encoded_lines, encoded_prev_lines, encoded_next_lines)])
+        df = df.join(pd.DataFrame(func_vuls, columns=['func_vul']))
+        return df
 
 
 # Less precise since all 3 features are concatenated before embedding creation
@@ -288,10 +270,8 @@ class EncoderBERTStringConcat:
 
     # Return n 768 vectors by encoding element-wise concatenated input strings
     # n ... length of input lists
-    def encode(self, list_lines, list_prev_lines, list_next_lines):
+    def encode(self, list_lines, list_prev_lines, list_next_lines, func_vuls):
         encoded_lines = self.__bert_encode(list_lines, list_prev_lines, list_next_lines)
-        return encoded_lines
-        
-    # not supported (use EncoderBERTVectorConcat instead)
-    def encodeSingle(self, list_lines):
-        raise NotImplementedError("use EncoderBERTVectorConcat instead")
+        df = pd.DataFrame(encoded_lines)
+        df = df.join(pd.DataFrame(func_vuls, columns=['func_vul']))
+        return df
